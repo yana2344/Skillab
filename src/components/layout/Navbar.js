@@ -1,9 +1,10 @@
 import * as React from "react";
 import { Box, IconButton, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import AuthContext from "../../context/AuthProvider";
+import { signOut } from "firebase/auth";
+import { auth } from "../../firebaseConfig";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
@@ -11,6 +12,7 @@ import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
+import { useAuth } from "../../context/AuthProvider";
 
 export default function LandingPageNavBar() {
   const theme = useTheme();
@@ -18,7 +20,7 @@ export default function LandingPageNavBar() {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
-  const { setAuth } = useContext(AuthContext);
+  const { user } = useAuth();
 
   //manage menu logout
   const handleClick = (event) => {
@@ -32,9 +34,14 @@ export default function LandingPageNavBar() {
     // if used in more components, this should be in context
     // axios to /logout endpoint
     setAnchorEl(null);
-    setAuth({});
-    localStorage.clear();
-    navigate("/login");
+    if (!user) {
+      navigate("/login");
+    } else {
+      signOut(auth)
+          .then(() => console.log("Signed out"))
+          .catch((err) => console.error(err));
+      localStorage.clear();
+    }
   };
 
   const dashboard = () => {
@@ -51,34 +58,41 @@ export default function LandingPageNavBar() {
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Logo
-          </Typography>
-          <Button color="inherit">My favorite</Button>
-          <Button color="inherit">Udemy Business</Button>
-          <IconButton
-            aria-controls={open ? "basic-menu" : undefined}
-            aria-haspopup="true"
-            aria-expanded={open ? "true" : undefined}
-            onClick={handleClick}>
-            <PersonOutlinedIcon />
-          </IconButton>
-          <Menu
-            id="basic-menu"
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            slotProps={{ "aria-labelledby": "basic-button" }}>
-            <MenuItem onClick={dashboard}>Teacher dashboard</MenuItem>
-            <MenuItem onClick={account}>My account</MenuItem>
-            <MenuItem onClick={courses}>My courses</MenuItem>
-            <MenuItem onClick={logout}>Logout</MenuItem>
-          </Menu>
-        </Toolbar>
-      </AppBar>
-    </Box>
+      <Box sx={{ flexGrow: 1 }}>
+        <AppBar position="static">
+          <Toolbar>
+            <Typography
+                variant="h3"
+                component="div"
+                sx={{ flexGrow: 1 }}
+                className="logo" // Apply the custom CSS class here
+            >
+              SkilLab
+            </Typography>
+
+            <Button color="inherit">My favorite</Button>
+            <Button color="inherit">SkilLab Business</Button>
+
+            <IconButton
+                aria-controls={open ? "basic-menu" : undefined}
+                aria-haspopup="true"
+                aria-expanded={open ? "true" : undefined}
+                onClick={handleClick}>
+              <PersonOutlinedIcon />
+            </IconButton>
+            <Menu
+                id="basic-menu"
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                slotProps={{ "aria-labelledby": "basic-button" }}>
+              <MenuItem onClick={dashboard}>Teacher dashboard</MenuItem>
+              <MenuItem onClick={account}>My account</MenuItem>
+              <MenuItem onClick={courses}>My courses</MenuItem>
+              <MenuItem onClick={logout}>{!user ? "Login" : "Logout"}</MenuItem>
+            </Menu>
+          </Toolbar>
+        </AppBar>
+      </Box>
   );
 }

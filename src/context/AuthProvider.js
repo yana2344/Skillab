@@ -1,48 +1,23 @@
-import { createContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { removeUserSession, setUserSession } from "../script/useSessionStorage";
+import { createContext, useContext, useEffect, useState } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebaseConfig";
 
-const AuthContext = createContext({});
+const AuthContext = createContext();
+
+export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const [auth, setAuth] = useState({});
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // let updateToken = async () => {
-  //   let response = await fetch("https://app.bigbag-web.com/authenticate", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       Authorization: `Token ${authTokens}`,
-  //     },
-  //   });
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+    });
 
-  //   let data = await response.json();
+    return () => unsubscribe();
+  }, []);
 
-  //   if (response.status === 200) {
-  //     const accessToken = data.token;
-  //     const userEmail = data.email;
-  //     setAuthTokens(accessToken);
-  //     setUser(userEmail);
-  //     setUserSession(data.email, data.token);
-  //   } else {
-  //     logoutUser();
-  //   }
-
-  //   // if(loading){
-  //   //     setLoading(false)
-  //   // }
-  // };
-
-  //https://www.cluemediator.com/login-app-create-login-form-in-reactjs-using-secure-rest-api
-  //check token on refresh page
-
-  // const AUTH_URL = "/authenticate"
-
-  // const response = await axios.get(`AUTH_URL?Token=${token}`).then(response => {
-  //   setUserSession(response.data.token, response.data.email);
-  // });
-
-  return <AuthContext.Provider value={{ auth, setAuth }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user }}>{!loading && children}</AuthContext.Provider>;
 };
-
-export default AuthContext;
