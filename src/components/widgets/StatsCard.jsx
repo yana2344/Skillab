@@ -1,7 +1,7 @@
 import { Paper } from "@mui/material";
 import { useTheme } from "@mui/system";
 import { tokens } from "../../theme";
-
+//statistics on dashaboard for teacher
 const StatsCard = ({ children, flexDirection, m, p, alignItems }) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);

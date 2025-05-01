@@ -2,6 +2,7 @@ import { Box, useTheme } from "@mui/material";
 import React from "react";
 import { tokens } from "../../theme";
 
+// table data for users list
 const TableLayout = ({ children }) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);

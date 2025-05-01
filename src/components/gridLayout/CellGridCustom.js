@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-
+// colomn layout
 const CellGridCustom = ({ children, gridColumn, width,height, alignItems, justifyContent }) => {
     return (
         <Box

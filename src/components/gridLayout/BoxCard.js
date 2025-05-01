@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 
-const BoxCard = ({ children, backgroundColor, m, rowGap, boxShadow, height }) => {
+const BoxCard = ({ children, backgroundColor, m, p, rowGap, boxShadow, height }) => {
     return (
         <Box
             width="100%"
@@ -10,10 +10,11 @@ const BoxCard = ({ children, backgroundColor, m, rowGap, boxShadow, height }) =>
             boxShadow={boxShadow}
             rowGap={rowGap}
             columnGap="20px"
-            p="15px"
+            p={p}
             display="grid"
             gridTemplateColumns="repeat(12, 1fr)"
             //gridAutoRow="100px"
+
             backgroundColor={backgroundColor}>
             {children}
         </Box>

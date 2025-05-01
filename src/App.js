@@ -12,11 +12,12 @@ import Courses from "./pages/teacher/Courses";
 import CoursePage from "./pages/teacher/CoursePage";
 import Dashboard from "./pages/teacher/Dashboard";
 import StudentCourses from "./pages/student/StudentCourses";
-import AddNewCourse from "./pages/teacher/AddNewCourse";
+import AddNewCourse from "./pages/teacher/courses/AddNewCourse";
 import Users from "./pages/teacher/Users";
 import AccountPage from "./pages/student/AccountPage";
 import Login from "./pages/global/Login";
 import NotFound404 from "./pages/global/NotFound404";
+import ViewCoursePage from "./pages/student/ViewCoursePage";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -39,7 +40,7 @@ function App() {
                     <Route path="/" element={<StudentLayout />}>
                       <Route index element={<LandingPage />} />
                       <Route path="/student_courses" element={<StudentCourses />} />
-                      {/* <Route path="/student_courses/:id" element={<StudentCourses />} /> */}
+                      <Route path="/student_courses/:id" element={<ViewCoursePage />} />
                       <Route path="/account" element={<AccountPage />} />
                     </Route>
                     {/* Teacher routes */}
@@ -48,7 +49,8 @@ function App() {
                       <Route path="/courses" element={<Courses />} />
                       <Route path="/courses/:id" element={<CoursePage />} />
                       <Route path="/users" element={<Users />} />
-                      <Route path="/add_new_course" element={<AddNewCourse />} />
+                      <Route path="/course/new" element={<AddNewCourse />} />
+                      <Route path="/course/edit/:courseId" element={<AddNewCourse />} />
                     </Route>
                   </Route>
                 </Route>
