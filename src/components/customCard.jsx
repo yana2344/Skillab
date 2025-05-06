@@ -5,7 +5,7 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Button from "@mui/material/Button";
 import { Typography, Chip, Stack } from "@mui/material";
-
+// layout for teacher courses card
 export default function CustomCard({ title, description, image, status, color, onClick }) {
     return (
         <Card sx={{ width: 345, height: 276 }}>

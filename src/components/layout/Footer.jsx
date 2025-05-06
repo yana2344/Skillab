@@ -39,18 +39,18 @@ export default function Footer() {
                         <Typography
                             sx={{
                                 fontSize: "20px",
-                                color: "#1C1C1D",
+                                color: "inerthite",
                                 fontWeight: "700",
                                 mb: 2,
                             }}>
                             Products
                         </Typography>
 
-                        <FooterLink>Listing</FooterLink>
+                        <FooterLink>Our Courses</FooterLink>
                         <br />
-                        <FooterLink>Properties</FooterLink>
+                        <FooterLink>Categories</FooterLink>
                         <br />
-                        <FooterLink>Agents</FooterLink>
+                        <FooterLink>Teachers</FooterLink>
                         <br />
                         <FooterLink>Blog</FooterLink>
                     </Box>
@@ -59,14 +59,14 @@ export default function Footer() {
                         <Typography
                             sx={{
                                 fontSize: "20px",
-                                color: "#1C1C1D",
+                                color: "inerthite",
                                 fontWeight: "700",
                                 mb: 2,
                             }}>
                             Resources
                         </Typography>
 
-                        <FooterLink>Our Homes</FooterLink>
+                        <FooterLink>Who we are</FooterLink>
                         <br />
                         <FooterLink>Stories</FooterLink>
                         <br />
@@ -79,7 +79,7 @@ export default function Footer() {
                         <Typography
                             sx={{
                                 fontSize: "20px",
-                                color: "#1C1C1D",
+                                color: "inerthite",
                                 fontWeight: "700",
                                 mb: 2,
                             }}>
@@ -99,7 +99,7 @@ export default function Footer() {
                         <Typography
                             sx={{
                                 fontSize: "20px",
-                                color: "#1C1C1D",
+                                color: "inerthite",
                                 fontWeight: "700",
                                 mb: 2,
                             }}>
@@ -113,7 +113,7 @@ export default function Footer() {
                                 fontWeight: "500",
                                 mb: 2,
                             }}>
-                            You’ll find your next home, in any style you prefer.
+                            You’ll find your next course.
                         </Typography>
 
                         <IconBox></IconBox>

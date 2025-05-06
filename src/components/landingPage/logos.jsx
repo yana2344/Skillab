@@ -1,7 +1,7 @@
 import cmpLogosImg from "../../resources/logos.png";
 import { Box, Container } from "@mui/material";
 
-export default function Reviews() {
+export default function Logos() {
     return (
         <Box>
             <Container>

@@ -6,15 +6,14 @@ import { Avatar, Box, IconButton, Typography, useTheme } from "@mui/material";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
 import { Add, Chat } from "@mui/icons-material";
-import SendIcon from "@mui/icons-material/Send";
 import EngineeringIcon from "@mui/icons-material/Engineering";
 import SettingsIcon from "@mui/icons-material/Settings";
-import EmailIcon from "@mui/icons-material/Email";
 import ExtensionIcon from "@mui/icons-material/Extension";
 import FeedbackIcon from "@mui/icons-material/Feedback";
 import imagePic from "../../resources/user.png";
 import VideoSettingsIcon from "@mui/icons-material/VideoSettings";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
+import { useAuth } from "../../context/AuthProvider";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
     const theme = useTheme();
@@ -61,6 +60,8 @@ const SubMenuCustom = ({ label, icon, children }) => {
 const SidebarPage = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+    const { user } = useAuth();
+
     const [selected, setSelected] = useState(localStorage.getItem("selectedItem") || "DASHBOARD");
 
     const { collapseSidebar, collapsed } = useProSidebar();
@@ -126,11 +127,10 @@ const SidebarPage = () => {
                             </Box>
                             <Box textAlign="center">
                                 <Typography variant="h2" color={colors.white[500]} fontWeight="bold" sx={{ m: "10px 0 0 0" }}>
-                                    {/* {"userData?.first_name"} */}
-                                    {"YANA"}
+                                    {user.name}
                                 </Typography>
                                 <Typography variant="h5" color={colors.black[800]}>
-                                    {"IT Developer"}
+                                    {user.email}
                                 </Typography>
                             </Box>
                         </Box>
@@ -172,17 +172,7 @@ const SidebarPage = () => {
                             />
                         </SubMenuCustom>
 
-                        <SubMenuCustom label="MESSAGES" icon={<Chat />}>
-                            <Item
-                                title="Incoming"
-                                to="/incoming_mess"
-                                icon={<EmailIcon />}
-                                selected={selected}
-                                setSelected={setSelected}
-                            />
-
-                            <Item title="Sent" to="sent_mess" icon={<SendIcon />} selected={selected} setSelected={setSelected} />
-                        </SubMenuCustom>
+                        <Item title="MESSAGES" to="/chat" icon={<Chat />} selected={selected} setSelected={setSelected} />
 
                         <SubMenuCustom label="SETTINGS" icon={<SettingsIcon />}>
                             <Item

@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebaseConfig";
+import { fetchUserData } from "../api/student_api/fetchUserData";
 
 const AuthContext = createContext();
 
@@ -11,8 +12,16 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        const userData = await fetchUserData(currentUser.uid);
+        // Merge auth user and Firestore userData
+        const mergedUser = { ...currentUser, ...userData };
+        setUser(mergedUser);
+        console.log("auth data", userData);
+      } else {
+        setUser(null);
+      }
       setLoading(false);
     });
 

@@ -3,7 +3,7 @@ import { collection, addDoc, getDoc, getDocs, doc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useAuth } from "../../context/AuthProvider";
 
-export const useSaveCourse = () => {
+export const useTeacherCourse = () => {
   const { user } = useAuth();
 
   const saveCourse = async ({ title, description, thumbnailFile, chapters, status }) => {
@@ -26,8 +26,8 @@ export const useSaveCourse = () => {
 
       for (const lesson of chapter.lessons) {
         const lessonVideoRef = ref(
-          storage,
-          `users/${user.uid}/courses/${title}/chapters/${chapter.title}/${lesson.title}`
+            storage,
+            `users/${user.uid}/courses/${title}/chapters/${chapter.title}/${lesson.title}`
         );
         await uploadBytes(lessonVideoRef, lesson.videoFile);
         const lessonVideoUrl = await getDownloadURL(lessonVideoRef);
@@ -49,8 +49,9 @@ export const useSaveCourse = () => {
       title,
       description,
       thumbnailUrl,
-      author: user.displayName || "Unknown",
-      feedback: 0,
+      author: user.name || "Unknown",
+      rating: 0,
+      feedbacks: [],
       chapters: uploadedChapters,
       createdAt: new Date(),
       isPublished: status,

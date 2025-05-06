@@ -28,7 +28,6 @@ const Login = () => {
     const navigate = useNavigate();
 
     const handleSubmit = async () => {
-        console.log(email, password);
         //setLoading(true);
         try {
             await signInWithEmailAndPassword(auth, email, password);

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
     Button,
     TextField,
@@ -8,55 +9,40 @@ import {
     Collapse,
     IconButton,
     CircularProgress,
-    Drawer,
     List,
     ListItem,
     ListItemText,
     Divider,
-    FormControlLabel,
+    useTheme,
 } from "@mui/material";
 import Rating from "@mui/material/Rating";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import CheckIcon from "@mui/icons-material/Check";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { getCourseById } from "../../api/student_api/fetchLessons";
-import { useAuth } from "../../context/AuthProvider";
-
+import ContactMailIcon from "@mui/icons-material/ContactMail";
+import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
+import { tokens } from "../../theme";
+import RatingDialog from "../../components/dialog/RatingDialog";
+import { useFeedback } from "../../api/teacher_api/feedback_provider";
+// to watch the course
 const ViewCoursePage = () => {
     const [activeChapter, setActiveChapter] = useState(0);
     const [activeLesson, setActiveLesson] = useState(0);
     const [expandedChapters, setExpandedChapters] = useState([0]);
     const [isAutoplayEnabled, setIsAutoplayEnabled] = useState(true);
     const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
-    const [isCaptionsEnabled, setIsCaptionsEnabled] = useState(false);
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
+    const navigate = useNavigate();
+    const [open, setOpen] = useState(false);
+
     const [searchQuery, setSearchQuery] = useState("");
     const [value, setValue] = React.useState(2);
-    const [course, setCourse] = useState([]);
-    const { user } = useAuth();
+    const [courses, setCourse] = useState([]);
 
-    useEffect(() => {
-        const fetchCourse = async () => {
-            const courseData = await getCourseById(user, "fApdPdUlgpPAezDZRGtu");
-            setCourse(courseData);
-            setValue(courseData.rating);
-            console.log(courseData);
-        };
-
-        fetchCourse();
-    }, []);
-
-    const courseData = [
-        {
-            title: "Getting Started with React",
-            lessons: [
-                { title: "Introduction to the Course", duration: "5:30", completed: true },
-                { title: "Setting Up Your Development Environment", duration: "12:45", completed: true },
-                { title: "Creating Your First React App", duration: "18:20", completed: false },
-            ],
-        },
-        // Additional chapters omitted for brevity
-    ];
+    const { saveFeedback } = useFeedback();
+    const location = useLocation();
+    const { course } = location.state || {};
 
     const totalLessons = course?.chapters?.reduce((acc, chapter) => acc + (chapter.lessons.length || 0), 0) || 0;
     const completedLessons =
@@ -67,8 +53,9 @@ const ViewCoursePage = () => {
 
     const progressPercentage = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
-    const currentChapter = course?.chapters[activeChapter] || { lessons: [] };
-    const currentLesson = currentChapter.lessons[activeLesson];
+    const currentChapter = course?.chapters?.[activeChapter] ?? { lessons: [] };
+
+    const currentLesson = currentChapter?.lessons?.[activeLesson] ?? null;
 
     const toggleChapter = (index) => {
         setExpandedChapters(
@@ -89,21 +76,24 @@ const ViewCoursePage = () => {
             setActiveLesson(activeLesson - 1);
         } else if (activeChapter > 0) {
             setActiveChapter(activeChapter - 1);
-            setActiveLesson(courseData[activeChapter - 1].lessons.length - 1);
+            setActiveLesson(course[activeChapter - 1].lessons.length - 1);
         }
     };
 
     const goToNextLesson = () => {
         if (activeLesson < currentChapter.lessons.length - 1) {
             setActiveLesson(activeLesson + 1);
-        } else if (activeChapter < courseData.length - 1) {
+        } else if (activeChapter < course.chapters.length - 1) {
             setActiveChapter(activeChapter + 1);
             setActiveLesson(0);
         }
     };
 
     const markAsComplete = () => {
-        alert("Lesson marked as complete!");
+        const updatedCourse = { ...course };
+        const lessonToUpdate = updatedCourse.chapters[activeChapter].lessons[activeLesson];
+        lessonToUpdate.completed = !lessonToUpdate.completed;
+        setCourse(updatedCourse);
     };
 
     const filteredCourseData = searchQuery
@@ -118,7 +108,7 @@ const ViewCoursePage = () => {
     return (
         <Box sx={{ display: "flex", minHeight: "100vh" }}>
             {/* Left Sidebar */}
-            <Box sx={{ flex: 2, bgcolor: "black", maxWidth: "33.33%", p: 2 }}>
+            <Box sx={{ flexGrow: 8, bgcolor: colors.primary[800], maxWidth: "33.33%", p: 2 }}>
                 <Box>
                     <Typography variant="h6">{course.title}</Typography>
                     <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
@@ -168,16 +158,12 @@ const ViewCoursePage = () => {
             <Box sx={{ flexGrow: 2, p: 3 }}>
                 {/* Video Player */}
                 <Paper sx={{ height: 400, position: "relative", bgcolor: "grey.200" }}>
-                    <img
-                        src="https://public.readdy.ai/ai/img_res/1cea81e17c922a5857d5654cdbe28a4c.jpg"
+                    <video
+                        controls
+                        src={currentLesson.videoUrl}
                         alt="Video"
                         style={{ width: "100%", height: "100%", objectFit: "cover" }}
                     />
-                    <Box sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
-                        <IconButton color="primary" sx={{ backgroundColor: "white" }}>
-                            <PlayArrowIcon fontSize="large" />
-                        </IconButton>
-                    </Box>
                 </Paper>
 
                 {/* Video Controls */}
@@ -200,18 +186,73 @@ const ViewCoursePage = () => {
                 {/* Lesson Content */}
                 <Box sx={{ mt: 4 }}>
                     <Typography variant="body2" color="primary">
-                        Chapter {activeChapter + 1}: {course.title}
+                        Chapter {activeChapter + 1}: {currentChapter.title}
                     </Typography>
                     <Typography variant="h4">{currentLesson.title}</Typography>
 
-                    <Typography variant="body1" sx={{ mt: 2 }}>
-                        {course.description}
-                    </Typography>
-
                     <Rating sx={{ mt: 1 }} name="read-only" value={value} readOnly />
-                    <Typography variant="body1" sx={{ mt: 2 }}>
-                        {course.rating}
-                    </Typography>
+
+                    <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+                        <Typography
+                            variant="body1"
+                            sx={{
+                                mt: 2,
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                display: "-webkit-box",
+                                WebkitBoxOrient: "vertical",
+                                WebkitLineClamp: 2,
+                            }}>
+                            {course.description}
+                        </Typography>
+                    </Box>
+
+                    <Box sx={{ display: "flex", mt: 2, flexDirection: "column" }}>
+                        <Box
+                            sx={{
+                                display: "flex",
+                            }}>
+                            <Typography variant="h4" sx={{ mt: 4 }}>
+                                Instructor: {course.author}
+                            </Typography>
+                        </Box>
+                        <Box
+                            sx={{
+                                display: "flex",
+
+                                justifyContent: "space-between",
+                            }}>
+                            <Button
+                                startIcon={<ContactMailIcon />}
+                                variant="contained"
+                                color="primary"
+                                sx={{ mt: 2, display: "flex", alignItems: "center" }}
+                                onClick={() => {
+                                    navigate("/student_chat", {
+                                        state: { course },
+                                    });
+                                }}>
+                                Contact Instructor
+                            </Button>
+                            <Button
+                                startIcon={<ThumbUpOffAltIcon />}
+                                variant="filled"
+                                color="primary"
+                                sx={{
+                                    mt: 2,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    "&:hover": {
+                                        color: colors.black[700],
+                                    },
+                                }}
+                                onClick={() => {
+                                    setOpen(true);
+                                }}>
+                                Leave FeedBack
+                            </Button>
+                        </Box>
+                    </Box>
 
                     {/* Notes Section */}
                     <Box sx={{ mt: 3 }}>
@@ -226,6 +267,15 @@ const ViewCoursePage = () => {
                     </Box>
                 </Box>
             </Box>
+            <RatingDialog
+                open={open}
+                onClose={() => setOpen(false)}
+                onClick={async (rating, feedback) => {
+                    await saveFeedback(course.author_id, course.id, rating, feedback);
+
+                    setOpen(false);
+                }}
+            />
         </Box>
     );
 };

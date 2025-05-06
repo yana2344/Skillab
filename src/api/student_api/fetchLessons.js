@@ -1,32 +1,48 @@
-import { doc, getDoc } from "firebase/firestore";
+import { doc, addDoc, getDoc, getDocs, collection } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
+import { useAuth } from "../../context/AuthProvider";
 
-export const getCourseById = async (user, lessonId) => {
-    try {
-        if (!user) {
-            throw new Error("User not authenticated");
+export const useCourses = () => {
+    const { user } = useAuth();
+
+    const applyToLesson = async (course) => {
+        const userCoursesRef = collection(db, "users", user.uid, "appliedCourses");
+
+        try {
+            await addDoc(userCoursesRef, {
+                course: course,
+                appliedAt: new Date().toISOString(),
+                courseId: course.id,
+            });
+            console.log("Student applied to course!");
+        } catch (error) {
+            console.error("Error applying to course:", error);
         }
+    };
 
-        const courseRef = doc(db, "users", user.uid, "teacher_courses", lessonId);
-        const snapshot = await getDoc(courseRef);
+    const getAppliedLessons = async () => {
+        const ref = collection(db, "users", user.uid, "appliedCourses");
+        const snapshot = await getDocs(ref);
 
-        if (snapshot.exists()) {
-            const data = snapshot.data();
-            return {
-                id: snapshot.id,
-                title: data.title || "",
-                author: data.author || "",
-                description: data.description || "",
-                rating: data.rating || "",
-                feedbacks: data.feedbacks || [],
-                chapters: data.chapters || [],
-            };
-        } else {
-            console.warn("No lesson found with that ID.");
-            return null;
-        }
-    } catch (error) {
-        console.error("Error fetching lesson by ID:", error);
-        return null;
-    }
+        const courses = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
+
+        return courses;
+    };
+
+    const getLesson = async (teacherId, courseId) => {
+        const ref = doc(db, "users", teacherId, "teacher_courses", courseId);
+        const snapshot = await getDoc(ref);
+
+        const courses = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
+
+        return courses;
+    };
+
+    return { applyToLesson, getAppliedLessons, getLesson };
 };

@@ -62,18 +62,34 @@ export default function LandingPageNavBar() {
         <AppBar position="static">
           <Toolbar>
             <Typography
+                onClick={() => navigate("/")}
                 variant="h3"
                 component="div"
-                sx={{ flexGrow: 1 }}
+                sx={{ flexGrow: 1, cursor: "pointer" }}
                 className="logo" // Apply the custom CSS class here
             >
               SkilLab
             </Typography>
 
-            <Button color="inherit">My favorite</Button>
+            <Button
+                sx={{
+                  "&:hover": {
+                    backgroundColor: colors.black[700],
+                  },
+                }}
+                color="inherit"
+                onClick={() => navigate("/student_courses")}>
+              My favorite
+            </Button>
             <Button color="inherit">SkilLab Business</Button>
 
             <IconButton
+                sx={{
+                  "&:hover": {
+                    backgroundColor: colors.black[700],
+                  },
+                }}
+                color="inherit"
                 aria-controls={open ? "basic-menu" : undefined}
                 aria-haspopup="true"
                 aria-expanded={open ? "true" : undefined}
