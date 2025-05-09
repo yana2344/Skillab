@@ -6,7 +6,7 @@ import CardMedia from "@mui/material/CardMedia";
 import Button from "@mui/material/Button";
 import { Typography, Chip, Stack } from "@mui/material";
 // layout for teacher courses card
-export default function CustomCard({ title, description, image, status, color, onClick }) {
+export default function CustomCard({ title, description, image, status, color, onClick, onDelete }) {
     return (
         <Card sx={{ width: 345, height: 276 }}>
             <CardMedia sx={{ height: 140 }} src={image} title={title} component="img" />
@@ -31,11 +31,15 @@ export default function CustomCard({ title, description, image, status, color, o
                     {description}
                 </Typography>
             </CardContent>
+
             <CardActions>
                 <Button size="small" onClick={onClick}>
                     Edit
                 </Button>
                 <Button size="small">View course</Button>
+                <Button size="small" color="error" onClick={onDelete}>
+                    Delete
+                </Button>
             </CardActions>
         </Card>
     );

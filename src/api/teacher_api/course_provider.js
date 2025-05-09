@@ -1,10 +1,19 @@
 import { db, storage } from "../../firebaseConfig";
-import { collection, addDoc, getDoc, getDocs, doc } from "firebase/firestore";
+import { collection, addDoc, getDoc, getDocs, doc, deleteDoc} from "firebase/firestore";
+import { deleteObject, listAll } from "firebase/storage";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useAuth } from "../../context/AuthProvider";
 
 export const useTeacherCourse = () => {
   const { user } = useAuth();
+
+  const deleteCourse = async (courseId) => {
+    if (!user) throw new Error("User not authenticated");
+
+    const courseRef = doc(db, "users", user.uid, "teacher_courses", courseId);
+    await deleteDoc(courseRef);
+
+  };
 
   const saveCourse = async ({ title, description, thumbnailFile, chapters, status }) => {
     if (!user) throw new Error("User not authenticated");
@@ -110,5 +119,5 @@ export const useTeacherCourse = () => {
     }
   };
 
-  return { saveCourse, fetchAllCourses, getCourseById };
+  return { saveCourse, fetchAllCourses, getCourseById, deleteCourse};
 };
